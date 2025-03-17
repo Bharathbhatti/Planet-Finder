@@ -33,25 +33,26 @@ interface Size {
   name: string;
 }
 interface Filters {
-  color: Color["id"];
-  shape: Shape["id"];
-  size: Size["id"];
+  color: Color["id"][];
+  shape: Shape["id"][];
+  size: Size["id"][];
 }
 
 const PlanetSearch = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filters, setFilters] = useState<Filters>({
-    color: "",
-    shape: "",
-    size: "",
+    color: [],
+    shape: [],
+    size: [],
   });
   const [planets, setPlanets] = useState([]);
-  const [sizes, setSizes] = useState([]);
-  const [colors, setColors] = useState([]);
-  const [shapes, setShapes] = useState([]);
+  const [sizes, setSizes] = useState<Size[]>([]);
+  const [colors, setColors] = useState<Color[]>([]);
+  const [shapes, setShapes] = useState<Shape[]>([]);
 
-  const handleFilterChange = (key: keyof Filters, value: string) => {
+  const handleFilterChange = (key: keyof Filters, value: string[]) => {
     setFilters((prev) => ({ ...prev, [key]: value as Filters[typeof key] }));
+    // console.log(filters);
   };
 
   useEffect(() => {
@@ -74,7 +75,7 @@ const PlanetSearch = () => {
       <Input.Search
         placeholder="Search planets..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(e) => setSearchTerm(e.target.id)}
         onSearch={() => {}}
         onPressEnter={() => {}}
       />
@@ -83,10 +84,10 @@ const PlanetSearch = () => {
           mode="multiple"
           placeholder="Filter by color"
           className="w-full"
-          // onChange={(value) => handleFilterChange("color", value)}
+          onChange={(value) => handleFilterChange("color", value)}
         >
           {colors.map((color: Color) => (
-            <Option key={color.id} value={color.name}>
+            <Option key={color.id} value={color.id}>
               {color.name}
             </Option>
           ))}
@@ -95,10 +96,10 @@ const PlanetSearch = () => {
           mode="multiple"
           placeholder="Filter by shape"
           className="w-full"
-          // onChange={(value) => handleFilterChange("shape", value)}
+          onChange={(value) => handleFilterChange("shape", value)}
         >
           {shapes.map((shape: Shape) => (
-            <Option key={shape.id} value={shape.name}>
+            <Option key={shape.id} value={shape.id}>
               {shape.name}
             </Option>
           ))}
@@ -110,7 +111,7 @@ const PlanetSearch = () => {
           onChange={(value) => handleFilterChange("size", value)}
         >
           {sizes.map((size: Size) => (
-            <Option key={size.id} value={size.name}>
+            <Option key={size.id} value={size.id}>
               {size.name}
             </Option>
           ))}
@@ -120,9 +121,17 @@ const PlanetSearch = () => {
         {planets.map((planet: Planet) => (
           <Card key={planet.name}>
             <h2>{planet.name}</h2>
-            <p>Color: {planet.color}</p>
-            <p>Shape: {planet.shape}</p>
-            <p>Size: {planet.size}</p>
+            <p>
+              Color:{" "}
+              {colors.find((color) => color.id === planet.color)?.name ?? ""}
+            </p>
+            <p>
+              Shape:{" "}
+              {shapes.find((shape) => shape.id === planet.shape)?.name ?? ""}
+            </p>
+            <p>
+              Size: {sizes.find((size) => size.id === planet.size)?.name ?? ""}
+            </p>
           </Card>
         ))}
       </div>
