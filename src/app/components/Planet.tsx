@@ -1,48 +1,80 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Input, Select, Card } from 'antd';
+import { useEffect, useState } from "react";
+import { Input, Select, Card } from "antd";
+import {
+  fetchColors,
+  fetchPlanets,
+  fetchShapes,
+  fetchSizes,
+} from "../API/getdata";
 
 const { Option } = Select;
 
-const colors = ['Red', 'Blue', 'Green'] as const;
-const shapes = ['Circle','Oval'] as const;
-const sizes = ['Small', 'Medium', 'Large'] as const;
-
 interface Planet {
   name: string;
-  description: string;
-  color: (typeof colors)[number];
-  shape: (typeof shapes)[number];
-  size: (typeof sizes)[number];
+  color: string;
+  shape: string;
+  size: string;
 }
 
-const planets: Planet[] = [
-  { name: 'Mars', description: 'The Red Planet', color: 'Red', shape: 'Circle', size: 'Medium' },
-  { name: 'Earth', description: 'Our Home Planet', color: 'Blue', shape: 'Circle', size: 'Medium' },
-  { name: 'Jupiter', description: 'The Gas Giant', color: 'Green', shape: 'Oval', size: 'Large' }
-];
+interface Color {
+  id: string;
+  name: string;
+}
 
+interface Shape {
+  id: string;
+  name: string;
+}
+
+interface Size {
+  id: string;
+  name: string;
+}
 interface Filters {
-  color: Planet['color'][];
-  shape: Planet['shape'][];
-  size: Planet['size'][];
+  color: Color["id"];
+  shape: Shape["id"];
+  size: Size["id"];
 }
 
 const PlanetSearch = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [filters, setFilters] = useState<Filters>({ color: [], shape: [], size: [] });
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filters, setFilters] = useState<Filters>({
+    color: "",
+    shape: "",
+    size: "",
+  });
+  const [planets, setPlanets] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [shapes, setShapes] = useState([]);
 
-  const handleFilterChange = (key: keyof Filters, value: string[]) => {
-    setFilters(prev => ({ ...prev, [key]: value as Filters[typeof key] }));
+  const handleFilterChange = (key: keyof Filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value as Filters[typeof key] }));
   };
+
+  useEffect(() => {
+    const data = async () => {
+      const planets = await fetchPlanets();
+      setPlanets(planets);
+      const sizes = await fetchSizes();
+      setSizes(sizes);
+      const shapes = await fetchShapes();
+      setShapes(shapes);
+      const colors = await fetchColors();
+      setColors(colors);
+    };
+    data();
+    console.log(planets);
+  }, []);
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-4">
       <Input.Search
         placeholder="Search planets..."
         value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
+        onChange={(e) => setSearchTerm(e.target.value)}
         onSearch={() => {}}
         onPressEnter={() => {}}
       />
@@ -51,44 +83,48 @@ const PlanetSearch = () => {
           mode="multiple"
           placeholder="Filter by color"
           className="w-full"
-          onChange={value => handleFilterChange('color', value)}
+          // onChange={(value) => handleFilterChange("color", value)}
         >
-          {colors.map(color => (
-            <Option key={color} value={color}>{color}</Option>
+          {colors.map((color: Color) => (
+            <Option key={color.id} value={color.name}>
+              {color.name}
+            </Option>
           ))}
         </Select>
         <Select
           mode="multiple"
           placeholder="Filter by shape"
           className="w-full"
-          onChange={value => handleFilterChange('shape', value)}
+          // onChange={(value) => handleFilterChange("shape", value)}
         >
-          {shapes.map(shape => (
-            <Option key={shape} value={shape}>{shape}</Option>
+          {shapes.map((shape: Shape) => (
+            <Option key={shape.id} value={shape.name}>
+              {shape.name}
+            </Option>
           ))}
         </Select>
         <Select
           mode="multiple"
           placeholder="Filter by size"
           className="w-full"
-          onChange={value => handleFilterChange('size', value)}
+          onChange={(value) => handleFilterChange("size", value)}
         >
-          {sizes.map(size => (
-            <Option key={size} value={size}>{size}</Option>
+          {sizes.map((size: Size) => (
+            <Option key={size.id} value={size.name}>
+              {size.name}
+            </Option>
           ))}
         </Select>
       </div>
       <div className="space-y-4">
-        {planets
-          .filter(planet => planet.name.toLowerCase().includes(searchTerm.toLowerCase()))
-          .filter(planet => !filters.color.length || filters.color.includes(planet.color))
-          .filter(planet => !filters.shape.length || filters.shape.includes(planet.shape))
-          .filter(planet => !filters.size.length || filters.size.includes(planet.size))
-          .map(planet => (
-            <Card key={planet.name} title={planet.name} className="shadow-md">
-              <p>{planet.description}</p>
-            </Card>
-          ))}
+        {planets.map((planet: Planet) => (
+          <Card key={planet.name}>
+            <h2>{planet.name}</h2>
+            <p>Color: {planet.color}</p>
+            <p>Shape: {planet.shape}</p>
+            <p>Size: {planet.size}</p>
+          </Card>
+        ))}
       </div>
     </div>
   );
