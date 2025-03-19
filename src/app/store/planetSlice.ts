@@ -59,19 +59,25 @@ const initialState: PlanetState = {
 };
 
 // Fetch data asynchronously
-export const loadInitialData = createAsyncThunk("planets/loadData", async () => {
-  const [planets, colors, shapes, sizes] = await Promise.all([
-    fetchPlanets(),
-    fetchColors(),
-    fetchShapes(),
-    fetchSizes(),
-  ]);
-  return { planets, colors, shapes, sizes };
-});
+export const loadInitialData = createAsyncThunk(
+  "planets/loadData",
+  async () => {
+    const [planets, colors, shapes, sizes] = await Promise.all([
+      fetchPlanets(),
+      fetchColors(),
+      fetchShapes(),
+      fetchSizes(),
+    ]);
+    return { planets, colors, shapes, sizes };
+  }
+);
 
-export const applyFilters = createAsyncThunk("planets/applyFilters", async (filters: Filters) => {
-  return await getFilteredPlanets(filters);
-});
+export const applyFilters = createAsyncThunk(
+  "planets/applyFilters",
+  async (filters: Filters) => {
+    return await getFilteredPlanets(filters);
+  }
+);
 
 // Slice
 const planetsSlice = createSlice({

@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { Input, Select, Card } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
-import { loadInitialData, setFilters, applyFilters } from "../store/planetSlice";
+import {
+  loadInitialData,
+  setFilters,
+  applyFilters,
+} from "../store/planetSlice";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const { Option } = Select;
@@ -22,7 +26,9 @@ const PlanetSearch = () => {
   const searchParams = useSearchParams();
   const [currentSearchText, setCurrentSearchText] = useState("");
 
-  const { planets, colors, shapes, sizes, filters } = useSelector((state: RootState) => state.planets);
+  const { planets, colors, shapes, sizes, filters } = useSelector(
+    (state: RootState) => state.planets
+  );
 
   useEffect(() => {
     dispatch(loadInitialData());
@@ -41,11 +47,17 @@ const PlanetSearch = () => {
   const setLocationByFilterProps = () => {
     const queryParams = new URLSearchParams();
     if (filters.q.length > 0) queryParams.set("q", filters.q);
-    if (filters.color.length > 0) queryParams.set("colors", filters.color.join(","));
-    if (filters.shape.length > 0) queryParams.set("shapes", filters.shape.join(","));
-    if (filters.size.length > 0) queryParams.set("sizes", filters.size.join(","));
-    
-    router.replace("?" + queryParams.toString(), { scroll: false, shallow: true } as any);
+    if (filters.color.length > 0)
+      queryParams.set("colors", filters.color.join(","));
+    if (filters.shape.length > 0)
+      queryParams.set("shapes", filters.shape.join(","));
+    if (filters.size.length > 0)
+      queryParams.set("sizes", filters.size.join(","));
+
+    router.replace("?" + queryParams.toString(), {
+      scroll: false,
+      shallow: true,
+    } as any);
   };
 
   const setFilterFromQueryParams = () => {
@@ -62,7 +74,10 @@ const PlanetSearch = () => {
     }
   };
 
-  const handleFilterChange = (key: keyof typeof filters, value: string[] | string) => {
+  const handleFilterChange = (
+    key: keyof typeof filters,
+    value: string[] | string
+  ) => {
     dispatch(setFilters({ ...filters, [key]: value as any }));
   };
 
@@ -70,7 +85,7 @@ const PlanetSearch = () => {
     setCurrentSearchText(e.target.value);
   };
 
-  const ifPlanetMatches = (planet:Planet) => {
+  const ifPlanetMatches = (planet: Planet) => {
     return (
       (!filters.color.length || filters.color.includes(planet.color)) &&
       (!filters.shape.length || filters.shape.includes(planet.shape)) &&
