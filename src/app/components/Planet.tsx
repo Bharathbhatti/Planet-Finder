@@ -94,12 +94,15 @@ const PlanetSearch = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-4">
+    <div className="p-6 max-w-4xl mx-auto space-y-4 bg-gradient-to-r from-purple-500 to-blue-500 min-h-screen text-white">
+      <h1 className="text-4xl font-bold text-center mb-6">🌎 Planet Finder</h1>
       <Input.Search
         placeholder="Search planets..."
         value={currentSearchText}
         onChange={(e) => handleSearchChange(e)}
         onPressEnter={(e) => handleFilterChange("q", e.currentTarget.value)}
+        onSearch={(value) => handleFilterChange("q", value)}
+        className="w-full rounded-md p-2 text-black"
       />
       <div className="grid grid-cols-3 gap-4">
         <Select
@@ -142,22 +145,16 @@ const PlanetSearch = () => {
           ))}
         </Select>
       </div>
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-4 mt-4">
         {planets.filter(ifPlanetMatches).map((planet) => (
-          <Card key={planet.name}>
-            <h2>{planet.name}</h2>
-            <p className="mt-3 text-gray-500">
-              {planet.name} has{" "}
-              {colors.find((c) => c.id === planet.color)?.name} color and{" "}
-              {shapes.find((s) => s.id === planet.shape)?.name} shape!
+          <Card key={planet.name} className="bg-white text-black rounded-lg shadow-lg p-4">
+            <h2 className="text-xl font-bold">{planet.name}</h2>
+            <p className="mt-3 text-gray-700">
+              {planet.name} has {colors.find((c) => c.id === planet.color)?.name} color and {shapes.find((s) => s.id === planet.shape)?.name} shape!
             </p>
-            <p className="text-gray-500">
-              The size of the {planet.name} is{" "}
-              {sizes.find((sz) => sz.id === planet.size)?.name}
+            <p className="text-gray-700">
+              The size of the {planet.name} is {sizes.find((sz) => sz.id === planet.size)?.name}
             </p>
-            {/* <p>Color: {colors.find((c) => c.id === planet.color)?.name}</p>
-            <p>Shape: {shapes.find((s) => s.id === planet.shape)?.name}</p>
-            <p>Size: {sizes.find((sz) => sz.id === planet.size)?.name}</p> */}
           </Card>
         ))}
       </div>
