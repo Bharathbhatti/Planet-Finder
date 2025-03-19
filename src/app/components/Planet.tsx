@@ -146,9 +146,18 @@ const PlanetSearch = () => {
         {planets.filter(ifPlanetMatches).map((planet) => (
           <Card key={planet.name}>
             <h2>{planet.name}</h2>
-            <p>Color: {colors.find((c) => c.id === planet.color)?.name}</p>
+            <p className="mt-3 text-gray-500">
+              {planet.name} has{" "}
+              {colors.find((c) => c.id === planet.color)?.name} color and{" "}
+              {shapes.find((s) => s.id === planet.shape)?.name} shape!
+            </p>
+            <p className="text-gray-500">
+              The size of the {planet.name} is{" "}
+              {sizes.find((sz) => sz.id === planet.size)?.name}
+            </p>
+            {/* <p>Color: {colors.find((c) => c.id === planet.color)?.name}</p>
             <p>Shape: {shapes.find((s) => s.id === planet.shape)?.name}</p>
-            <p>Size: {sizes.find((sz) => sz.id === planet.size)?.name}</p>
+            <p>Size: {sizes.find((sz) => sz.id === planet.size)?.name}</p> */}
           </Card>
         ))}
       </div>
