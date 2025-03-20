@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input, Select, Card } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
@@ -26,36 +26,47 @@ interface Planet {
 const PlanetSearch = () => {
   const dispatcher = useDispatch<AppDispatch>();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [isLoaded, setIsLoaded] = useState(false);
   const [currentSearchText, setCurrentSearchText] = useState("");
   const { planets, colors, shapes, sizes, filters } = useSelector(
     (state: RootState) => state.planets
   );
 
   useEffect(() => {
-    dispatcher(loadInitialData());
+    const load = async () => { 
+      setFilterFromQueryParams();
+      dispatcher(loadInitialData());
+      setIsLoaded(true);
+    };
+    if (!isLoaded) load();
   }, []);
 
   useEffect(() => {
-    setLocationByFilterProps();
-    setCurrentSearchText(filters.q);
-    dispatcher(applyFilters(filters));
+    if (isLoaded) {
+      setLocationByFilterProps();
+      setCurrentSearchText(filters.q);
+      dispatcher(applyFilters(filters));
+    }
   }, [filters]);
-
-  useEffect(() => {
-    setFilterFromQueryParams();
-  }, [searchParams]);
 
   const setLocationByFilterProps = () => {
     const queryParams = new URLSearchParams();
     if (filters.q.length > 0) queryParams.set("q", filters.q);
-    if (filters.color.length > 0)
-      queryParams.set("colors", filters.color.join(","));
-    if (filters.shape.length > 0)
-      queryParams.set("shapes", filters.shape.join(","));
-    if (filters.size.length > 0)
-      queryParams.set("sizes", filters.size.join(","));
-
+    if (filters.color.length > 0) {
+      filters.color.forEach((color) => {
+        queryParams.append("color", color);
+      });
+    }
+    if (filters.shape.length > 0) {
+      filters.shape.forEach((shape) => {
+        queryParams.append("shape", shape);
+      });
+    }
+    if (filters.size.length > 0) {
+      filters.size.forEach((size) => {
+        queryParams.append("size", size);
+      });
+    }
     router.replace("?" + queryParams.toString(), {
       scroll: false,
       shallow: true,
@@ -64,15 +75,18 @@ const PlanetSearch = () => {
 
   const setFilterFromQueryParams = () => {
     if (typeof window !== "undefined") {
+      console.log("window", window.location.search);
       const queryParams = new URLSearchParams(window.location.search);
       dispatcher(
         setFilters({
           q: queryParams.get("q") || "",
-          color: queryParams.get("colors")?.split(",") || [],
-          shape: queryParams.get("shapes")?.split(",") || [],
-          size: queryParams.get("sizes")?.split(",") || [],
+          color: queryParams.getAll("color") || [],
+          shape: queryParams.getAll("shape") || [],
+          size: queryParams.getAll("size") || [],
         })
       );
+    } else {
+      console.log("no window");
     }
   };
 
@@ -102,7 +116,7 @@ const PlanetSearch = () => {
         alt="space"
         layout="fill"
         objectFit="cover"
-        className="absolute z-0"
+        className="absolute z-0 shadow-lg blur-md" 
       />
       <div className="relative z-10 p-8 max-w-4xl mx-auto space-y-6 bg-gradient-to-r from-purple-500 to-blue-500 bg-opacity-50 rounded-lg shadow-lg min-h-screen">
         <motion.h1
@@ -132,51 +146,31 @@ const PlanetSearch = () => {
         </motion.div>
 
         {/* Filters */}
-        <motion.div
-          className="grid grid-cols-3 gap-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2 }}
-        >
-          <Select
-            mode="multiple"
-            placeholder="Filter by color"
-            className="w-full rounded-lg shadow-lg"
-            onChange={(value) => handleFilterChange("color", value)}
-            value={filters.color}
-          >
-            {colors.map((color) => (
-              <Option key={color.id} value={color.id}>
-                {color.name}
-              </Option>
-            ))}
-          </Select>
-          <Select
-            mode="multiple"
-            placeholder="Filter by shape"
-            className="w-full rounded-lg shadow-lg"
-            onChange={(value) => handleFilterChange("shape", value)}
-            value={filters.shape}
-          >
-            {shapes.map((shape) => (
-              <Option key={shape.id} value={shape.id}>
-                {shape.name}
-              </Option>
-            ))}
-          </Select>
-          <Select
-            mode="multiple"
-            placeholder="Filter by size"
-            className="w-full rounded-lg shadow-lg"
-            onChange={(value) => handleFilterChange("size", value)}
-            value={filters.size}
-          >
-            {sizes.map((size) => (
-              <Option key={size.id} value={size.id}>
-                {size.name}
-              </Option>
-            ))}
-          </Select>
+        <motion.div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-white" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 2 }}>
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Filter by Color</h3>
+            <Select mode="multiple" placeholder="Select color" className="w-full rounded-lg shadow-lg" onChange={(value) => handleFilterChange("color", value)} value={filters.color}>
+              {colors.map((color) => (
+                <Option key={color.id} value={color.id}>{color.name}</Option>
+              ))}
+            </Select>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Filter by Shape</h3>
+            <Select mode="multiple" placeholder="Select shape" className="w-full rounded-lg shadow-lg" onChange={(value) => handleFilterChange("shape", value)} value={filters.shape}>
+              {shapes.map((shape) => (
+                <Option key={shape.id} value={shape.id}>{shape.name}</Option>
+              ))}
+            </Select>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Filter by Size</h3>
+            <Select mode="multiple" placeholder="Select size" className="w-full rounded-lg shadow-lg" onChange={(value) => handleFilterChange("size", value)} value={filters.size}>
+              {sizes.map((size) => (
+                <Option key={size.id} value={size.id}>{size.name}</Option>
+              ))}
+            </Select>
+          </div>
         </motion.div>
 
         {/* Planet Cards */}

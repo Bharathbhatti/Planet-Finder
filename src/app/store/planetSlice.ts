@@ -59,25 +59,18 @@ const initialState: PlanetState = {
 };
 
 // Fetch data asynchronously
-export const loadInitialData = createAsyncThunk(
-  "planets/loadData",
-  async () => {
-    const [planets, colors, shapes, sizes] = await Promise.all([
-      fetchPlanets(),
-      fetchColors(),
-      fetchShapes(),
-      fetchSizes(),
-    ]);
-    return { planets, colors, shapes, sizes };
-  }
-);
+export const loadInitialData = createAsyncThunk("planets/loadData", async () => {
+  const [colors, shapes, sizes] = await Promise.all([
+    fetchColors(),
+    fetchShapes(),
+    fetchSizes(),
+  ]);
+  return { colors, shapes, sizes };
+});
 
-export const applyFilters = createAsyncThunk(
-  "planets/applyFilters",
-  async (filters: Filters) => {
-    return await getFilteredPlanets(filters);
-  }
-);
+export const applyFilters = createAsyncThunk("planets/applyFilters", async (filters : Filters) => {
+  return await getFilteredPlanets(filters);
+});
 
 // Slice
 const planetsSlice = createSlice({
@@ -91,7 +84,6 @@ const planetsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(loadInitialData.fulfilled, (state, action) => {
-        state.planets = action.payload.planets;
         state.colors = action.payload.colors;
         state.shapes = action.payload.shapes;
         state.sizes = action.payload.sizes;
