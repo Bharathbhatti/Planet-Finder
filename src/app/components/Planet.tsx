@@ -10,6 +10,9 @@ import {
   applyFilters,
 } from "../store/planetSlice";
 import { useRouter, useSearchParams } from "next/navigation";
+import spaceimage from "../../../public/space.jpg";
+import Image from "next/image";
+import { motion } from "framer-motion";
 
 const { Option } = Select;
 
@@ -21,23 +24,22 @@ interface Planet {
 }
 
 const PlanetSearch = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatcher = useDispatch<AppDispatch>();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentSearchText, setCurrentSearchText] = useState("");
-
   const { planets, colors, shapes, sizes, filters } = useSelector(
     (state: RootState) => state.planets
   );
 
   useEffect(() => {
-    dispatch(loadInitialData());
-  }, [dispatch]);
+    dispatcher(loadInitialData());
+  }, []);
 
   useEffect(() => {
     setLocationByFilterProps();
     setCurrentSearchText(filters.q);
-    dispatch(applyFilters(filters));
+    dispatcher(applyFilters(filters));
   }, [filters]);
 
   useEffect(() => {
@@ -63,7 +65,7 @@ const PlanetSearch = () => {
   const setFilterFromQueryParams = () => {
     if (typeof window !== "undefined") {
       const queryParams = new URLSearchParams(window.location.search);
-      dispatch(
+      dispatcher(
         setFilters({
           q: queryParams.get("q") || "",
           color: queryParams.get("colors")?.split(",") || [],
@@ -78,7 +80,7 @@ const PlanetSearch = () => {
     key: keyof typeof filters,
     value: string[] | string
   ) => {
-    dispatch(setFilters({ ...filters, [key]: value as any }));
+    dispatcher(setFilters({ ...filters, [key]: value as any }));
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,69 +96,113 @@ const PlanetSearch = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-4 bg-gradient-to-r from-purple-500 to-blue-500 min-h-screen text-white">
-      <h1 className="text-4xl font-bold text-center mb-6">🌎 Planet Finder</h1>
-      <Input.Search
-        placeholder="Search planets..."
-        value={currentSearchText}
-        onChange={(e) => handleSearchChange(e)}
-        onPressEnter={(e) => handleFilterChange("q", e.currentTarget.value)}
-        onSearch={(value) => handleFilterChange("q", value)}
-        className="w-full rounded-md p-2 text-black"
+    <div className="relative min-h-screen text-white overflow-hidden">
+      <Image
+        src={spaceimage}
+        alt="space"
+        layout="fill"
+        objectFit="cover"
+        className="absolute z-0"
       />
-      <div className="grid grid-cols-3 gap-4">
-        <Select
-          mode="multiple"
-          placeholder="Filter by color"
-          className="w-full"
-          onChange={(value) => handleFilterChange("color", value)}
-          value={filters.color}
+      <div className="relative z-10 p-8 max-w-4xl mx-auto space-y-6 bg-gradient-to-r from-purple-500 to-blue-500 bg-opacity-50 rounded-lg shadow-lg min-h-screen">
+        <motion.h1
+          className="text-5xl font-extrabold text-center mb-8 text-white"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
         >
-          {colors.map((color) => (
-            <Option key={color.id} value={color.id}>
-              {color.name}
-            </Option>
-          ))}
-        </Select>
-        <Select
-          mode="multiple"
-          placeholder="Filter by shape"
-          className="w-full"
-          onChange={(value) => handleFilterChange("shape", value)}
-          value={filters.shape}
+          🌎 Planet Finder
+        </motion.h1>
+
+        {/* Search Bar */}
+        <motion.div
+          className="relative"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5 }}
         >
-          {shapes.map((shape) => (
-            <Option key={shape.id} value={shape.id}>
-              {shape.name}
-            </Option>
-          ))}
-        </Select>
-        <Select
-          mode="multiple"
-          placeholder="Filter by size"
-          className="w-full"
-          onChange={(value) => handleFilterChange("size", value)}
-          value={filters.size}
+          <Input.Search
+            placeholder="Search planets..."
+            value={currentSearchText}
+            onChange={(e) => handleSearchChange(e)}
+            onPressEnter={(e) => handleFilterChange("q", e.currentTarget.value)}
+            onSearch={(value) => handleFilterChange("q", value)}
+            className="w-full p-3 text-lg rounded-lg shadow-lg border border-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-none text-black"
+          />
+        </motion.div>
+
+        {/* Filters */}
+        <motion.div
+          className="grid grid-cols-3 gap-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2 }}
         >
-          {sizes.map((size) => (
-            <Option key={size.id} value={size.id}>
-              {size.name}
-            </Option>
+          <Select
+            mode="multiple"
+            placeholder="Filter by color"
+            className="w-full rounded-lg shadow-lg"
+            onChange={(value) => handleFilterChange("color", value)}
+            value={filters.color}
+          >
+            {colors.map((color) => (
+              <Option key={color.id} value={color.id}>
+                {color.name}
+              </Option>
+            ))}
+          </Select>
+          <Select
+            mode="multiple"
+            placeholder="Filter by shape"
+            className="w-full rounded-lg shadow-lg"
+            onChange={(value) => handleFilterChange("shape", value)}
+            value={filters.shape}
+          >
+            {shapes.map((shape) => (
+              <Option key={shape.id} value={shape.id}>
+                {shape.name}
+              </Option>
+            ))}
+          </Select>
+          <Select
+            mode="multiple"
+            placeholder="Filter by size"
+            className="w-full rounded-lg shadow-lg"
+            onChange={(value) => handleFilterChange("size", value)}
+            value={filters.size}
+          >
+            {sizes.map((size) => (
+              <Option key={size.id} value={size.id}>
+                {size.name}
+              </Option>
+            ))}
+          </Select>
+        </motion.div>
+
+        {/* Planet Cards */}
+        <motion.div
+          className="grid grid-cols-1 gap-6 mt-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2.5 }}
+        >
+          {planets.filter(ifPlanetMatches).map((planet) => (
+            <motion.div key={planet.name} whileHover={{ scale: 1.05 }}>
+              <Card className="bg-white bg-opacity-10 text-white rounded-xl shadow-lg backdrop-blur-md">
+                <h2 className="text-2xl font-bold text-black">{planet.name}</h2>
+                <p className="mt-2 text-black">
+                  {planet.name} has{" "}
+                  {colors.find((c) => c.id === planet.color)?.name} color and{" "}
+                  {shapes.find((s) => s.id === planet.shape)?.name} shape!
+                </p>
+                <p className="text-black">
+                  The size of {planet.name} is{" "}
+                  {sizes.find((sz) => sz.id === planet.size)?.name}
+                </p>
+              </Card>
+            </motion.div>
           ))}
-        </Select>
-      </div>
-      <div className="grid grid-cols-1 gap-4 mt-4">
-        {planets.filter(ifPlanetMatches).map((planet) => (
-          <Card key={planet.name} className="bg-white text-black rounded-lg shadow-lg p-4">
-            <h2 className="text-xl font-bold">{planet.name}</h2>
-            <p className="mt-3 text-gray-700">
-              {planet.name} has {colors.find((c) => c.id === planet.color)?.name} color and {shapes.find((s) => s.id === planet.shape)?.name} shape!
-            </p>
-            <p className="text-gray-700">
-              The size of the {planet.name} is {sizes.find((sz) => sz.id === planet.size)?.name}
-            </p>
-          </Card>
-        ))}
+        </motion.div>
       </div>
     </div>
   );
