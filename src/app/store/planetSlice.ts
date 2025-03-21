@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import {
   fetchColors,
-  fetchPlanets,
   fetchShapes,
   fetchSizes,
   getFilteredPlanets,
@@ -59,18 +58,24 @@ const initialState: PlanetState = {
 };
 
 // Fetch data asynchronously
-export const loadInitialData = createAsyncThunk("planets/loadData", async () => {
-  const [colors, shapes, sizes] = await Promise.all([
-    fetchColors(),
-    fetchShapes(),
-    fetchSizes(),
-  ]);
-  return { colors, shapes, sizes };
-});
+export const loadInitialData = createAsyncThunk(
+  "planets/loadData",
+  async () => {
+    const [colors, shapes, sizes] = await Promise.all([
+      fetchColors(),
+      fetchShapes(),
+      fetchSizes(),
+    ]);
+    return { colors, shapes, sizes };
+  }
+);
 
-export const applyFilters = createAsyncThunk("planets/applyFilters", async (filters : Filters) => {
-  return await getFilteredPlanets(filters);
-});
+export const applyFilters = createAsyncThunk(
+  "planets/applyFilters",
+  async (filters: Filters) => {
+    return await getFilteredPlanets(filters);
+  }
+);
 
 // Slice
 const planetsSlice = createSlice({

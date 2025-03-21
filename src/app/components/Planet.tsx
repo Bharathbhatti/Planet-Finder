@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Input, Select, Card } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
@@ -9,7 +9,7 @@ import {
   setFilters,
   applyFilters,
 } from "../store/planetSlice";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import spaceimage from "../../../public/space.jpg";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -33,7 +33,7 @@ const PlanetSearch = () => {
   );
 
   useEffect(() => {
-    const load = async () => { 
+    const load = async () => {
       setFilterFromQueryParams();
       dispatcher(loadInitialData());
       setIsLoaded(true);
@@ -75,7 +75,6 @@ const PlanetSearch = () => {
 
   const setFilterFromQueryParams = () => {
     if (typeof window !== "undefined") {
-      console.log("window", window.location.search);
       const queryParams = new URLSearchParams(window.location.search);
       dispatcher(
         setFilters({
@@ -116,11 +115,11 @@ const PlanetSearch = () => {
         alt="space"
         layout="fill"
         objectFit="cover"
-        className="absolute z-0 shadow-lg blur-md" 
+        className="absolute inset-0 w-full h-full object-cover z-0 shadow-lg blur-md"
       />
-      <div className="relative z-10 p-8 max-w-4xl mx-auto space-y-6 bg-gradient-to-r from-purple-500 to-blue-500 bg-opacity-50 rounded-lg shadow-lg min-h-screen">
+      <div className="relative z-10 p-8 sm:p-8 md:p-6 max-w-4xl mx-auto space-y-6 bg-gradient-to-r from-purple-500 to-blue-500 bg-opacity-50 rounded-lg shadow-lg min-h-screen">
         <motion.h1
-          className="text-5xl font-extrabold text-center mb-8 text-white"
+          className="text-6xl font-extrabold text-center mb-8 text-white"
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
@@ -146,28 +145,57 @@ const PlanetSearch = () => {
         </motion.div>
 
         {/* Filters */}
-        <motion.div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-white" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 2 }}>
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-white"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2 }}
+        >
           <div>
             <h3 className="text-lg font-semibold mb-2">Filter by Color</h3>
-            <Select mode="multiple" placeholder="Select color" className="w-full rounded-lg shadow-lg" onChange={(value) => handleFilterChange("color", value)} value={filters.color}>
+            <Select
+              mode="multiple"
+              placeholder="Select color"
+              className="w-full rounded-lg shadow-lg"
+              onChange={(value) => handleFilterChange("color", value)}
+              value={filters.color}
+            >
               {colors.map((color) => (
-                <Option key={color.id} value={color.id}>{color.name}</Option>
+                <Option key={color.id} value={color.id}>
+                  {color.name}
+                </Option>
               ))}
             </Select>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-2">Filter by Shape</h3>
-            <Select mode="multiple" placeholder="Select shape" className="w-full rounded-lg shadow-lg" onChange={(value) => handleFilterChange("shape", value)} value={filters.shape}>
+            <Select
+              mode="multiple"
+              placeholder="Select shape"
+              className="w-full rounded-lg shadow-lg"
+              onChange={(value) => handleFilterChange("shape", value)}
+              value={filters.shape}
+            >
               {shapes.map((shape) => (
-                <Option key={shape.id} value={shape.id}>{shape.name}</Option>
+                <Option key={shape.id} value={shape.id}>
+                  {shape.name}
+                </Option>
               ))}
             </Select>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-2">Filter by Size</h3>
-            <Select mode="multiple" placeholder="Select size" className="w-full rounded-lg shadow-lg" onChange={(value) => handleFilterChange("size", value)} value={filters.size}>
+            <Select
+              mode="multiple"
+              placeholder="Select size"
+              className="w-full rounded-lg shadow-lg"
+              onChange={(value) => handleFilterChange("size", value)}
+              value={filters.size}
+            >
               {sizes.map((size) => (
-                <Option key={size.id} value={size.id}>{size.name}</Option>
+                <Option key={size.id} value={size.id}>
+                  {size.name}
+                </Option>
               ))}
             </Select>
           </div>
@@ -182,14 +210,14 @@ const PlanetSearch = () => {
         >
           {planets.filter(ifPlanetMatches).map((planet) => (
             <motion.div key={planet.name} whileHover={{ scale: 1.05 }}>
-              <Card className="bg-white bg-opacity-10 text-white rounded-xl shadow-lg backdrop-blur-md">
+              <Card className="bg-white bg-opacity-10 text-white rounded-xl shadow-lg backdrop-blur-md p-4">
                 <h2 className="text-2xl font-bold text-black">{planet.name}</h2>
-                <p className="mt-2 text-black">
+                <p className="mt-2 text-black sm:text-base">
                   {planet.name} has{" "}
                   {colors.find((c) => c.id === planet.color)?.name} color and{" "}
                   {shapes.find((s) => s.id === planet.shape)?.name} shape!
                 </p>
-                <p className="text-black">
+                <p className="text-black sm:text-base">
                   The size of {planet.name} is{" "}
                   {sizes.find((sz) => sz.id === planet.size)?.name}
                 </p>

@@ -42,7 +42,6 @@ const fetchColors = async () => {
 
 const getFilteredPlanets = async (filters: any) => {
   try {
-    console.log(filters, window.location.search);
     const searchParams = new URLSearchParams();
     if (filters.q.length > 0) searchParams.set("q", filters.q);
     if (filters.color.length > 0) {
@@ -65,7 +64,6 @@ const getFilteredPlanets = async (filters: any) => {
       `${API_BASE_URL}/planets?${searchParams.toString()}`
     );
     const data = await response.json();
-    console.log(data);
     return data;
   } catch (error) {
     console.log(error);
