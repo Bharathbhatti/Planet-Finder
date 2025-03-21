@@ -1,3 +1,10 @@
+interface FilterOptions {
+  q: string;
+  color: string[];
+  shape: string[];
+  size: string[];
+}
+
 const API_BASE_URL = "https://api-planets.vercel.app";
 
 const fetchPlanets = async () => {
@@ -40,7 +47,7 @@ const fetchColors = async () => {
   }
 };
 
-const getFilteredPlanets = async (filters: any) => {
+const getFilteredPlanets = async (filters: FilterOptions) => {
   try {
     const searchParams = new URLSearchParams();
     if (filters.q.length > 0) searchParams.set("q", filters.q);

@@ -70,7 +70,7 @@ const PlanetSearch = () => {
     router.replace("?" + queryParams.toString(), {
       scroll: false,
       shallow: true,
-    } as any);
+    } as Parameters<typeof router.replace>[1]);
   };
 
   const setFilterFromQueryParams = () => {
@@ -93,7 +93,7 @@ const PlanetSearch = () => {
     key: keyof typeof filters,
     value: string[] | string
   ) => {
-    dispatcher(setFilters({ ...filters, [key]: value as any }));
+    dispatcher(setFilters({ ...filters, [key]: value }));
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
